@@ -61,6 +61,9 @@
     .analyze-output {
         font-family: 'Times New Roman', Times, serif;
     }
+    .analyze-output ul li {
+        margin-bottom: 1rem;
+    }
     </style>
 </head>
 <body>
@@ -76,13 +79,13 @@
             <div class="analyze-output">
                 <ul>
                     <li>
-                        <span>Word count  <span>{{word_count}}</span></span>
+                        <span>Word count: <span>{{word_count}}</span></span>
                     </li>
                     <li>
-                        <span>Page Title <span>{{title}}</span></span>
+                        <span>Page Title: <span>{{title}}</span></span>
                     </li>
                     <li>
-                        <span>Meta Description <span>{{meta_description}}</span></span>
+                        <span>Meta Description: <span>{{meta_description}}</span></span>
                         <ul>
                             {% for name, value in meta.items %}
                             <li>{{name}} : {{value}}</li>
@@ -90,15 +93,10 @@
                         </ul>
                     </li>
                     <li>
-                        <span>Keywords on-page <span>{{keyword}}</span></span>
-                        <ul>
-                            {% for keyword in keywords %}
-                            <li>{{keyword}}</li>
-                            {% endfor %}
-                        </ul>
+                        <span>Keywords on-page: <span>{{keywords}}</span></span>
                     </li>
                     <li>
-                        <span>Missing image alt-text </span>
+                        <span>Missing image alt-text: <span>{{no_alt_images_count}}</span></span>
                         <ul>
                             {% for image in no_alt_images %}
                             <li>{{image}}</li>
@@ -106,13 +104,13 @@
                         </ul>
                     </li>
                     <li>
-                        <span>Number of Internal Links <span>{{internal_links}}</span></span>
+                        <span>Number of Internal Links: <span>{{internal_links_count}}</span></span>
                     </li>
                     <li>
-                        <span>Number of External Links <span>{{external_links}}</span></span>
+                        <span>Number of External Links: <span>{{external_links_count}}</span></span>
                     </li>
                     <li>
-                        <span>Number of Broken Links <span>{{dead_links}}</span></span>
+                        <span>Number of Broken Links: <span>{{dead_links_count}}</span></span>
                     </li>
                 </ul>
             </div>

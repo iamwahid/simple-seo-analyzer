@@ -33,7 +33,12 @@ def analyze_site(site, sitemap=None):
         _current_keywords = _current_keywords + [word[1] for word in page.get("keywords", []) if word not in _current_keywords]
         result["keywords"] = _current_keywords
 
-    result.update(parse_site(site))
+    _parsed_output = parse_site(site)
+    # meta keywords
+    _keywords = _parsed_output.pop("keywords", "")
+
+    result.update(_parsed_output)
+    result["keywords"] = ", ".join(result.get("keywords", []))
     return result
 
 def is_root_link(url):
@@ -127,11 +132,15 @@ def parse_site(url):
     no_alt_images = [str(image) for image in images if not image.get("alt")]
 
     return {
-        "no_alt_images": no_alt_images,
-        "dead_links": len(dead_links),
-        "internal_links": len(internal_links),
-        "external_links": len(external_links),
         "meta": metas,
-        "keyword": metas.get("keywords", ""),
+        "_keywords": metas.get("keywords", ""),
         "meta_description": metas.get("description"),
+        "no_alt_images": no_alt_images,
+        "dead_links": dead_links,
+        "internal_links": internal_links,
+        "external_links": external_links,
+        "no_alt_images_count": len(no_alt_images),
+        "dead_links_count": len(dead_links),
+        "internal_links_count": len(internal_links),
+        "external_links_count": len(external_links),
     }
