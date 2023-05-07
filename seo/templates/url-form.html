@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    .content-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .container {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .form-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .form {
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+        background-color: white;
+        padding: 1.2rem;
+        border: 1px solid #ccc;
+    }
+    .analyze-output {
+        font-family: 'Times New Roman', Times, serif;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-wrapper">
+            <h1 class="form-title">SEO Audit Tool</h1>
+            <sub>Enter an URL address and get a Free Website Analysis!</sub>
+            <form action="/" method="post" class="form">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="AUDIT">
+            </form>
+            <div class="analyze-output">
+                <ul>
+                    <li>
+                        <span>Word count  <span>{{word_count}}</span></span>
+                    </li>
+                    <li>
+                        <span>Page Title <span>{{title}}</span></span>
+                    </li>
+                    <li>
+                        <span>Meta Description <span>{{meta_description}}</span></span>
+                        <ul>
+                            {% for name, value in meta.items %}
+                            <li>{{name}} : {{value}}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li>
+                        <span>Keywords on-page <span>{{keyword}}</span></span>
+                        <ul>
+                            {% for keyword in keywords %}
+                            <li>{{keyword}}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li>
+                        <span>Missing image alt-text </span>
+                        <ul>
+                            {% for image in no_alt_images %}
+                            <li>{{image}}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li>
+                        <span>Number of Internal Links <span>{{internal_links}}</span></span>
+                    </li>
+                    <li>
+                        <span>Number of External Links <span>{{external_links}}</span></span>
+                    </li>
+                    <li>
+                        <span>Number of Broken Links <span>{{dead_links}}</span></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

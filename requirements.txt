@@ -1,0 +1,5 @@
+Django==3.1
+djangorestframework==3.12.2
+pyseoanalyzer
+requests
+beautifulsoup4
