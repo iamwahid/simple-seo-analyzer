@@ -11,6 +11,7 @@
     }
     body {
         font-family: Arial, Helvetica, sans-serif;
+        background-color: #efefef;
     }
     .content-wrapper {
         width: 100%;
@@ -36,6 +37,26 @@
         background-color: white;
         padding: 1.2rem;
         border: 1px solid #ccc;
+        display: flex;
+        flex-direction: row;
+        width: 32%;
+    }
+    .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        margin-right: 0.5rem;
+    }
+    .form-submit {
+        color: white;
+        background-color: #ffbc4b;
+        border: 1px solid #ffbc4b;
+        padding: 8px 12px;
+    }
+    .form-submit:hover {
+        cursor: pointer;
+        background-color: #ffbc4b;
+        border: 1px solid #ffbc4b;
     }
     .analyze-output {
         font-family: 'Times New Roman', Times, serif;
@@ -50,7 +71,7 @@
             <form action="/" method="post" class="form">
                 {% csrf_token %}
                 {{ form }}
-                <input type="submit" value="AUDIT">
+                <input type="submit" value="AUDIT" class="form-submit">
             </form>
             <div class="analyze-output">
                 <ul>
