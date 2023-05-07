@@ -19,6 +19,9 @@ def analyze_site(site, sitemap=None):
                 print(f"Error: {e}")
                 continue
     
+    if not _has_http_protocol(site):
+        site = f"https://{site}"
+
     # handle if sitemap if causing error
     try:
         output = analyze(site, sitemap, follow_links=False)
@@ -40,6 +43,9 @@ def analyze_site(site, sitemap=None):
     result.update(_parsed_output)
     result["keywords"] = ", ".join(result.get("keywords", []))
     return result
+
+def _has_http_protocol(url):
+    return url.startswith("http://") or url.startswith("https://")
 
 def is_root_link(url):
     return not url.startswith("http") and url.startswith("/")
