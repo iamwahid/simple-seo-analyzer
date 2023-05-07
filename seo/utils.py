@@ -12,12 +12,14 @@ def analyze_site(site, sitemap=None):
             try:
                 response = requests.head(sitemap_url)
                 if response.status_code == 200:
-                    print(f"status code: {response.status_code} {sitemap_url}")
+                    # print(f"status code: {response.status_code} {sitemap_url}")
                     sitemap = sitemap_url
                     break
             except Exception as e:
                 print(f"Error: {e}")
                 continue
+    
+    # handle if sitemap if causing error
     try:
         output = analyze(site, sitemap, follow_links=False)
     except Exception as e:
@@ -67,45 +69,34 @@ def is_internal(base_url, url):
     return url.startswith(base_url)
 
 def is_active(proto, base_url, url):
-    # print(url)
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
     }
     url = build_url(proto, base_url, url)
 
-    # if url.startswith("mailto:") or url.startswith("tel:"):
     code = requests.head(url, headers=headers).status_code
     if code != 200:
         code = requests.get(url, headers=headers).status_code
     return code == 200
 
-def parse_site(url):
-    response = requests.get(url)
-    
-    res = BeautifulSoup(response.content, "html.parser")
-    images = res.findAll(get_images)
-    anchors = res.findAll(get_anchors)
-    metas = res.findAll(get_metas)
-    metas_ = {}
-    meta_desc = ""
+def _process_meta(metas):
+    _metas = {}
     for meta in metas:
         name = meta.get("name") if meta.get("name") else meta.get("property")
         if name:
-            if name == "description":
-                meta_desc = meta.get("content")
-            metas_[name.lower()] = meta.get("content")
+            _metas[name.lower()] = meta.get("content")
+    return _metas
 
-    proto = re.findall('(\w+)://', url)[0]
-    base_url = url.replace(f"{proto}://", "").split("/")[0]
-
-    urls = []
+def _process_anchor(proto, base_url, anchors):
+    _urls = []
     for _url in anchors:
         _url = _url.get("href")
         if is_root_link(_url) or is_relative_link(_url):
             _url = build_url(proto, base_url, _url)
-        urls.append(_url)
+        _urls.append(_url)
+    return _urls
 
-    no_alt_images = [str(image) for image in images if not image.get("alt")]
+def _process_url(proto, base_url, urls):
     _active_links = []
     futures = {}
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -115,18 +106,32 @@ def parse_site(url):
     for _url, future in futures.items():
         if future.result():
             _active_links.append(_url)
+    return _active_links
+
+def parse_site(url):
+    response = requests.get(url)
+    
+    res = BeautifulSoup(response.content, "html.parser")
+    images = res.findAll(get_images)
+    anchors = res.findAll(get_anchors)
+    metas = _process_meta(res.findAll(get_metas))
+
+    proto = re.findall('(\w+)://', url)[0]
+    base_url = url.replace(f"{proto}://", "").split("/")[0]
+    urls = _process_anchor(proto, base_url, anchors)
+    _active_links = _process_url(proto, base_url, urls)
 
     dead_links = [link for link in urls if link not in _active_links]
-
     internal_links = [link for link in _active_links if is_internal(base_url, link)]
     external_links = [link for link in _active_links if link not in internal_links]
+    no_alt_images = [str(image) for image in images if not image.get("alt")]
 
     return {
         "no_alt_images": no_alt_images,
         "dead_links": len(dead_links),
         "internal_links": len(internal_links),
         "external_links": len(external_links),
-        "meta": metas_,
-        "keyword": metas_.get("keywords", ""),
-        "meta_description": metas_.get("description"),
+        "meta": metas,
+        "keyword": metas.get("keywords", ""),
+        "meta_description": metas.get("description"),
     }
