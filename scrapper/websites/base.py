@@ -21,7 +21,8 @@ class BaseArticle:
             raise NotImplementedError("Subclasses should implement _get_authors()")
         try:
             _authors = self._get_authors()
-        except:
+        except Exception as e:
+            print(f"authors error: {e}")
             _authors = None
         return _authors
 

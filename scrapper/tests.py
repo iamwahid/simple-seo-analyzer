@@ -5,7 +5,7 @@ import requests
 import os
 import json
 
-from .websites import cnn, nytimes
+from .websites import cnn, nytimes, bbc
 from . import utils
 
 class CNNWebsiteTestCase(unittest.TestCase):
@@ -73,5 +73,35 @@ class NYTWebsiteUtilTestCase(unittest.TestCase):
     def test_scrape_article_1(self):
         articles = utils.scrape_articles("https://www.nytimes.com/")
         with open(os.path.join(settings.BASE_DIR, "scrapper/data/nytimes_1.json"), "w") as f:
+            json.dump(articles, f, indent=4)
+        self.assertNotEqual(articles, {})
+
+class BBCWebsiteTestCase(unittest.TestCase):
+    def test_scrape_article_1(self):
+        # resp = requests.get("https://www.bbc.com/news/world-us-canada-65521233")
+        # with open(os.path.join(settings.BASE_DIR, "scrapper/data/bbc/article_1.txt"), "wb") as f:
+        #     f.write(resp.content)
+        with open(os.path.join(settings.BASE_DIR, "scrapper/data/bbc/article_1.txt"), "r") as f:
+            content = f.read()
+        article = bbc.BBCArticle(content)
+        self.assertEqual(article.title, "Brownsville: Eight dead as car strikes people in Texas border town")
+        self.assertEqual(article.authors, ["kathryn armstrong"])
+        self.assertEqual(article.published_at, "2023-05-07 21:18:51+00:00")
+
+    def test_scrape_article_2(self):
+        # resp = requests.get("https://www.bbc.com/news/world-asia-india-65409483")
+        # with open(os.path.join(settings.BASE_DIR, "scrapper/data/bbc/article_2.txt"), "wb") as f:
+        #     f.write(resp.content)
+        with open(os.path.join(settings.BASE_DIR, "scrapper/data/bbc/article_2.txt"), "r") as f:
+            content = f.read()
+        article = bbc.BBCArticle(content)
+        self.assertEqual(article.title, "SCO summit : Why peace talks are not on Bilawal Bhutto Zardari's agenda in India")
+        self.assertEqual(article.authors, ["soutik biswas"])
+        self.assertEqual(article.published_at, "2023-05-05 04:56:45+00:00")
+
+class BBCWebsiteUtilTestCase(unittest.TestCase):
+    def test_scrape_article_1(self):
+        articles = utils.scrape_articles("https://www.bbc.com/")
+        with open(os.path.join(settings.BASE_DIR, "scrapper/data/bbc_1.json"), "w") as f:
             json.dump(articles, f, indent=4)
         self.assertNotEqual(articles, {})

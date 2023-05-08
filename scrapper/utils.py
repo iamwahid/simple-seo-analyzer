@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import re
 from scrapper.models import Article
-from scrapper.websites import cnn, nytimes
+from scrapper.websites import cnn, nytimes, bbc
 from seo import utils as seo_utils
 
 def insert_article(article):
@@ -37,11 +37,24 @@ def is_article_html(tag):
         url = tag.get("href", "")
         return url.endswith(".html") and not url.startswith("#") and not url.startswith("javascript")
 
+def is_bbc_article_link(tag):
+    if tag.name == "a":
+        url = tag.get("href", "")
+        reel = url.startswith("/reel")
+        numeric_endings = re.findall(r"\d+$", url)
+        return not reel and numeric_endings and not url.startswith("#") and not url.startswith("javascript")
+
+def is_bbc_homepage_body(tag):
+    if tag.name == "div" and tag.get("id") == "orb-modules":
+        return True
+
 def get_article_class(base_url):
-    if "cnn" in base_url:
+    if "cnn." in base_url:
         return cnn.CNNArticle
-    elif "nytimes" in base_url:
+    elif "nytimes." in base_url:
         return nytimes.NYTimesArticle
+    elif "bbc." in base_url:
+        return bbc.BBCArticle
     else:
         raise NotImplementedError(f"Article scrapping for {base_url} not supported")
 
@@ -51,9 +64,12 @@ def scrape_articles(url):
     base_url = url.replace(f"{proto}://", "").split("/")[0]
     soup = BeautifulSoup(response.content, 'html.parser')
     article_class = get_article_class(base_url)
-    
+
     if article_class in [cnn.CNNArticle, nytimes.NYTimesArticle]:
         articles_url = [article.get("href") for article in soup.findAll(is_article_html)]
+    elif article_class in [bbc.BBCArticle]:
+        _body_section = soup.find(is_bbc_homepage_body)
+        articles_url = [article.get("href") for article in _body_section.findAll(is_bbc_article_link)]
     else:
         raise NotImplementedError(f"Article scrapping for {base_url} not supported")
 
