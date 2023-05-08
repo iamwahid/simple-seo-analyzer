@@ -2,7 +2,7 @@ from django.db import models
 
 # Create Article model
 class Article(models.Model):
-    url = models.CharField(max_length=200, blank=True, null=True)
+    url = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=200, blank=True, null=True)
     author = models.CharField(max_length=200, blank=True, null=True)
     content = models.TextField("Output", blank=True, null=True)
