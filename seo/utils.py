@@ -5,6 +5,17 @@ from bs4 import BeautifulSoup
 import concurrent.futures
 
 def analyze_site(site, sitemap=None):
+    """
+    Analyze site and return the result
+
+    Args:
+        site (str): website url to analyze
+
+    Returns:
+        dict: result
+    """
+
+    # check if site has sitemap
     if not sitemap:
         for _index in ["sitemap.xml", "sitemap", "sitemap_index.xml"]:
             _site = site if not site.endswith("/") else site[:-1]
@@ -28,6 +39,7 @@ def analyze_site(site, sitemap=None):
     except Exception as e:
         output = analyze(site, follow_links=False)
 
+    # prepare the result
     result = {}
     for page in output.get("pages", []):
         result["word_count"] = page.get("word_count", 0)
@@ -36,10 +48,12 @@ def analyze_site(site, sitemap=None):
         _current_keywords = _current_keywords + [word[1] for word in page.get("keywords", []) if word not in _current_keywords]
         result["keywords"] = _current_keywords
 
+    # some result are generated from parse_site function
     _parsed_output = parse_site(site)
     # meta keywords
     _keywords = _parsed_output.pop("keywords", "")
 
+    # merge the result
     result.update(_parsed_output)
     result["keywords"] = ", ".join(result.get("keywords", []))
     return result
@@ -54,6 +68,8 @@ def is_relative_link(url):
     return not url.startswith("http") and not url.startswith("/")
 
 def build_url(proto, base_url, url):
+    # build url if it is relative or root link
+
     if is_root_link(url):
         url = f"{proto}://{base_url}{url}"
     elif is_relative_link(url):
@@ -62,24 +78,29 @@ def build_url(proto, base_url, url):
 
 
 def get_images(tag):
+    # check if tag is img element
     if tag.name == "img":
         return True
 
 def get_anchors(tag):
+    # check if tag is anchor element
     if tag.name == "a":
         url = tag.get("href")
         return url and not url.startswith("#") and not url.startswith("javascript")
 
 def get_metas(tag):
+    # check if tag is meta element
     if tag.name == "meta":
         return True
 
 def is_internal(base_url, url):
+    # check if url is internal link
     proto = re.findall('(\w+)://', url)[0]
     url = url.replace(f"{proto}://", "").split("/")[0]
     return url.startswith(base_url)
 
 def is_active(proto, base_url, url):
+    # check if url is active
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
     }
@@ -91,6 +112,7 @@ def is_active(proto, base_url, url):
     return code == 200
 
 def _process_meta(metas):
+    # process meta tags as dictionary of key value pair
     _metas = {}
     for meta in metas:
         name = meta.get("name") if meta.get("name") else meta.get("property")
@@ -99,6 +121,7 @@ def _process_meta(metas):
     return _metas
 
 def _process_anchor(proto, base_url, anchors):
+    # process anchor tags and build url
     _urls = []
     for _url in anchors:
         _url = _url.get("href")
@@ -108,6 +131,8 @@ def _process_anchor(proto, base_url, anchors):
     return _urls
 
 def _process_url(proto, base_url, urls):
+    # checking active urls parallely to fasten the process, return list of active urls
+
     _active_links = []
     futures = {}
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -122,6 +147,7 @@ def _process_url(proto, base_url, urls):
 def parse_site(url):
     response = requests.get(url)
     
+    # parse the html and get necessary tags
     res = BeautifulSoup(response.content, "html.parser")
     images = res.findAll(get_images)
     anchors = res.findAll(get_anchors)
@@ -132,6 +158,7 @@ def parse_site(url):
     urls = _process_anchor(proto, base_url, anchors)
     _active_links = _process_url(proto, base_url, urls)
 
+    # check links
     dead_links = [link for link in urls if link not in _active_links]
     internal_links = [link for link in _active_links if is_internal(base_url, link)]
     external_links = [link for link in _active_links if link not in internal_links]

@@ -7,6 +7,15 @@ from seo import utils as seo_utils
 
 
 def site_online(url):
+    """
+    Check if site is online and return the response
+
+    Args:
+        url (str): website url
+
+    Returns:
+        tuple: online (bool), response (requests.models.Response)
+    """
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
     }
@@ -14,6 +23,17 @@ def site_online(url):
     return response.status_code == 200, response
 
 def get_article_data(url, article_class):
+    """
+    Get article data from url
+
+    Args:
+        url (str): article url
+        article_class (scrapper.websites.BaseArticle): News Article class
+
+    Returns:
+        tuple: success (bool), article_data (dict)
+    """
+
     online, response = site_online(url)
 
     if not online:
@@ -30,11 +50,18 @@ def get_article_data(url, article_class):
     return True, dict(url=url, title=title, author=author, content=content, published_at=published_at)
 
 def is_article_html(tag):
+    """
+    Check if element contains article html link
+    """
+
     if tag.name == "a":
         url = tag.get("href", "")
         return url.endswith(".html") and not url.startswith("#") and not url.startswith("javascript")
 
 def is_bbc_article_link(tag):
+    """
+    Check if element contains BBC's article link
+    """
     if tag.name == "a":
         url = tag.get("href", "")
         reel = url.startswith("/reel")
@@ -42,10 +69,18 @@ def is_bbc_article_link(tag):
         return not reel and numeric_endings and not url.startswith("#") and not url.startswith("javascript")
 
 def is_bbc_homepage_body(tag):
+    """
+    Check if element contains is BBC's homepage body
+    """
+
     if tag.name == "div" and tag.get("id") == "orb-modules":
         return True
 
 def get_article_class(base_url):
+    """
+    get Article class based on base url
+    """
+
     if "cnn." in base_url:
         return cnn.CNNArticle
     elif "nytimes." in base_url:
@@ -56,6 +91,16 @@ def get_article_class(base_url):
         raise NotImplementedError(f"Article scrapping for {base_url} not supported")
 
 def scrape_articles(url):
+    """
+    Scrape all articles from url
+
+    Args:
+        url (str): website url
+
+    Returns:
+        list: list of article data
+    """
+
     # check website is onlune
     online, response = site_online(url)
     if not online:
@@ -87,7 +132,7 @@ def scrape_articles(url):
     
     articles = {}
     # TODO: limit the articles to scrape
-    for url in articles_url[:10]:
+    for url in articles_url[:20]:
         success, data = get_article_data(url, article_class)
         if success:
             articles[url] = data
