@@ -20,6 +20,10 @@ python manage.py scrape_news --site https://www.nytimes.com/ https://edition.cnn
 
 ![](./img/scrapper_record.png)
 
+![](./img/seo-analyzer.png)
+
+![](./img/seo-analyzer-output.png)
+
 # TODO
 - update readme seo-analyzer and scrapper
 - using MySQL database optional
