@@ -56,12 +56,21 @@ def get_article_class(base_url):
         raise NotImplementedError(f"Article scrapping for {base_url} not supported")
 
 def scrape_articles(url):
+    # check website is onlune
     online, response = site_online(url)
+    if not online:
+        raise Exception(f"Site {url} is not online")
+    
+    # get protocol and base url
     proto = re.findall('(\w+)://', url)[0]
     base_url = url.replace(f"{proto}://", "").split("/")[0]
+
+    # prepare soup
     soup = BeautifulSoup(response.content, 'html.parser')
+    # determine news article class based on base url
     article_class = get_article_class(base_url)
 
+    # get all articles url based on article class
     if article_class in [cnn.CNNArticle, nytimes.NYTimesArticle]:
         articles_url = [article.get("href") for article in soup.findAll(is_article_html)]
     elif article_class in [bbc.BBCArticle]:
