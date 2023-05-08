@@ -10,7 +10,8 @@ class BaseArticle:
             raise NotImplementedError("Subclasses should implement _get_title()")
         try:
             _title = self._get_title()
-        except:
+        except Exception as e:
+            print(f"title error: {e}")
             _title = None
         return _title
 
@@ -29,7 +30,7 @@ class BaseArticle:
         if not hasattr(self, "_get_content"):
             raise NotImplementedError("Subclasses should implement _get_content()")
         try:
-            _content = self._get_content()
+            _content = self._get_content()[0]
         except:
             _content = None
         return _content
@@ -40,6 +41,7 @@ class BaseArticle:
             raise NotImplementedError("Subclasses should implement _get_published_at()")
         try:
             _published_at = self._get_published_at()
-        except:
+        except Exception as e:
+            print(e)
             _published_at = None
         return _published_at

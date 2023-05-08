@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # custom app
     'seo.apps.SeoConfig',
+    'scrapper.apps.ScrapperConfig',
 ]
 
 MIDDLEWARE = [
