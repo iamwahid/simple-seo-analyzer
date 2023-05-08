@@ -17,7 +17,7 @@ class CNNWebsiteTestCase(unittest.TestCase):
             content = f.read()
         article = cnn.CNNArticle(content)
         self.assertEqual(article.title, "‘A Trump tribute act’: Meet Suella Braverman, the commander-in-chief of Britain’s culture wars")
-        self.assertEqual(article.authors, ["Rob Picheta"])
+        self.assertEqual(article.authors, ["rob picheta"])
         self.assertEqual(article.published_at, "2023-05-07 12:33:00")
 
     def test_scrape_article_2(self):
@@ -28,7 +28,7 @@ class CNNWebsiteTestCase(unittest.TestCase):
             content = f.read()
         article = cnn.CNNArticle(content)
         self.assertEqual(article.title, "Tottenham Hotspur and Crystal Palace condemn alleged racial abuse towards Son Heung-min during Premier League game")
-        self.assertEqual(article.authors, ["George Ramsay"])
+        self.assertEqual(article.authors, ["george ramsay"])
         self.assertEqual(article.published_at, "2023-05-07 10:25:00")
 
 
@@ -52,8 +52,8 @@ class NYTWebsiteTestCase(unittest.TestCase):
             content = f.read()
         article = nytimes.NYTimesArticle(content)
         self.assertEqual(article.title, "Leaders of Japan and South Korea Vow to Deepen Ties")
-        self.assertEqual(article.authors, ["Choe Sang-Hun", "Motoko Rich"])
-        self.assertEqual(str(article.published_at), "2023-05-07 12:28:47-04:00")
+        self.assertEqual(article.authors, ["choe sang-hun", "motoko rich"])
+        self.assertEqual(article.published_at, "2023-05-07 12:28:47-04:00")
 
     def test_scrape_article_2(self):
         headers = {
@@ -66,8 +66,8 @@ class NYTWebsiteTestCase(unittest.TestCase):
             content = f.read()
         article = nytimes.NYTimesArticle(content)
         self.assertEqual(article.title, "Did China Help Vancouver’s Mayor Win Election?")
-        self.assertEqual(article.authors, ["Dan Bilefsky"])
-        self.assertEqual(str(article.published_at), "2023-05-07 05:00:32-04:00")
+        self.assertEqual(article.authors, ["dan bilefsky"])
+        self.assertEqual(article.published_at, "2023-05-07 05:00:32-04:00")
 
 class NYTWebsiteUtilTestCase(unittest.TestCase):
     def test_scrape_article_1(self):

@@ -43,6 +43,6 @@ class BaseArticle:
         try:
             _published_at = self._get_published_at()
         except Exception as e:
-            print(e)
+            print(f"published_at error: {e}")
             _published_at = None
         return _published_at

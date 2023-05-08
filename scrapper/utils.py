@@ -2,12 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-from scrapper.models import Article
 from scrapper.websites import cnn, nytimes, bbc
 from seo import utils as seo_utils
 
-def insert_article(article):
-    Article.objects.create(**article)
 
 def site_online(url):
     headers = {
@@ -28,7 +25,7 @@ def get_article_data(url, article_class):
     title = article.title
     author = ", ".join(article.authors)
     content = article.content
-    published_at = str(article.published_at)
+    published_at = article.published_at
 
     return True, dict(url=url, title=title, author=author, content=content, published_at=published_at)
 
@@ -80,6 +77,7 @@ def scrape_articles(url):
             articles_url[i] = f"{proto}://{base_url}{url}"
     
     articles = {}
+    # TODO: limit the articles to scrape
     for url in articles_url[:10]:
         success, data = get_article_data(url, article_class)
         if success:

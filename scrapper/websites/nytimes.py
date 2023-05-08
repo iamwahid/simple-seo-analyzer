@@ -17,7 +17,7 @@ class NYTimesArticle(BaseArticle):
             tag2 = tag.name == "span" and "css-1baulvz" in tag.get("class", []) and tag.get("itemprop") == "name"
             if tag2:
                 return True
-        return [author.text.strip() for author in self.soup.findAll(is_author)]
+        return [author.text.strip().lower() for author in self.soup.findAll(is_author)]
 
     def _get_content(self):
         def is_content(tag):
@@ -48,4 +48,4 @@ class NYTimesArticle(BaseArticle):
         except Exception as e:
             pass
 
-        return _published_at
+        return str(_published_at) if _published_at else None

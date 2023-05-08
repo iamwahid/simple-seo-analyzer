@@ -48,4 +48,4 @@ class BBCArticle(BaseArticle):
             except Exception as e:
                 pass
             published_at = _published_at
-        return str(published_at)
+        return str(published_at) if published_at else None

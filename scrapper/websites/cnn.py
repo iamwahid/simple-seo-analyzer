@@ -19,7 +19,7 @@ class CNNArticle(BaseArticle):
             tag2 = tag.name == "span" and "byline__name" in tag.get("class", [])
             if tag1 or tag2:
                 return True
-        return [author.text.strip() for author in self.soup.findAll(is_author)]
+        return [author.text.strip().lower() for author in self.soup.findAll(is_author)]
 
     def _get_content(self):
         def is_content(tag):
@@ -37,13 +37,11 @@ class CNNArticle(BaseArticle):
             if tag1 or tag2:
                 return True
         
-        publisheds = []
+        published_at = None
         for content in self.soup.findAll(is_published_at):
-            published_at = None
             try:
                 timestr = content.text.strip().split("\n")[1].strip()
                 published_at = self._parse_datetime(timestr)
             except Exception as e:
                 pass
-            publisheds.append(published_at)
-        return str(publisheds[0])
+        return str(published_at) if published_at else None
